@@ -199,7 +199,7 @@
     </div>
 
     <div id="screen-intro" class="screen">
-        <h1>My girl was born 25 years ago today!</h1>
+        <h1>My girl was born 20 years ago today!</h1>
         <p>A beautiful interactive 3D universe awaits you...</p>
         <button onclick="transitionToCake()">Step Inside ✨</button>
     </div>
@@ -240,7 +240,7 @@
         <div class="modal-view">
             <h2>Some Sweet Moments</h2>
             <img class="moments-img"
-                src="https://ik.imagekit.io/iahxx76iz/WhatsApp%20Image%202026-05-29%20at%2022.11.46.jpeg"
+                src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop"
                 alt="Sweet memory placeholder">
             <button onclick="closeModal('modal-moments')">Back to Menu 🏠</button>
         </div>
@@ -645,39 +645,13 @@
             isCakeCut = true;
             document.getElementById('cake-prompt-text').innerText = "Happy Birthday, My Girl! 💖";
 
-            // Pre-explosion bounce and shake for dramatic effect
-            gsap.to(cakeGroup.position, {
-                y: -0.2,
-                duration: 0.15,
-                ease: "power1.inOut",
-                yoyo: true,
-                repeat: 2,
-                onStart: () => {
-                    // Camera shake on explosion start
-                    gsap.to(camera.position, {
-                        x: (Math.random() - 0.5) * 0.5,
-                        y: 2 + (Math.random() - 0.5) * 0.3,
-                        duration: 0.05,
-                        repeat: 8,
-                        yoyo: true
-                    });
-                }
-            });
-
             // Explode elements in 3D Coordinate Space using GSAP matrices
-            gsap.to(frostingGroup.position, { y: 6, opacity: 0, duration: 1.2, ease: "elastic.out(1.2)", delay: 0.3 });
-            gsap.to(cakeGroup.rotation, {
-                x: cakeGroup.rotation.x + Math.PI * 1.5,
-                y: cakeGroup.rotation.y + Math.PI * 3,
-                z: cakeGroup.rotation.z + Math.PI * 0.5,
-                duration: 1.4,
-                delay: 0.3,
-                ease: "power2.out"
-            });
+            gsap.to(frostingGroup.position, { y: 4, opacity: 0, duration: 0.8, ease: "power3.out" });
+            gsap.to(cakeGroup.rotation, { y: cakeGroup.rotation.y + Math.PI * 2, duration: 1.2 });
             gsap.to(cakeGroup.scale, {
-                x: 0, y: 0, z: 0, duration: 1.2, delay: 0.5, ease: "back.in(1.5)", onComplete: () => {
+                x: 0, y: 0, z: 0, duration: 1, delay: 0.3, ease: "power3.in", onComplete: () => {
                     // Drop 3D camera focus down closer to background workspace matrix
-                    gsap.to(camera.position, { x: 0, z: 10, y: 2, duration: 1 });
+                    gsap.to(camera.position, { z: 10, y: 2, duration: 1 });
                     changeScreen('screen-cake', 'screen-menu');
                 }
             });
@@ -834,42 +808,29 @@
 
                 const rocketGroup = new THREE.Group();
 
-                // Shiny cone for rocket body with enhanced glow
+                // Shiny cone for rocket body
                 const rocketGeo = new THREE.ConeGeometry(0.1, 0.35, 8);
-                const rocketMat = new THREE.MeshBasicMaterial({
-                    color: 0xfffbeb,
-                    emissive: 0xfbbf24,
-                    emissiveIntensity: 0.6
-                });
+                const rocketMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
                 const rocketMesh = new THREE.Mesh(rocketGeo, rocketMat);
                 rocketMesh.rotation.x = Math.PI; // pointing up
                 rocketGroup.add(rocketMesh);
 
-                // Enhanced glow light for ascending effect
-                const light = new THREE.PointLight(0xfbbf24, 2.5, 8);
+                // Internal light for ascending glow
+                const light = new THREE.PointLight(0xf472b6, 1.5, 6);
                 rocketGroup.add(light);
 
                 rocketGroup.position.set(x, -6, 0); // start offscreen
                 scene.add(rocketGroup);
-
-                // Rocket spinning animation for visual drama
-                gsap.to(rocketMesh.rotation, {
-                    z: Math.PI * 4,
-                    duration: 0.9,
-                    ease: "power1.inOut"
-                });
 
                 gsap.to(rocketGroup.position, {
                     y: targetY,
                     duration: 0.9,
                     ease: "power2.out",
                     onUpdate: () => {
-                        // Enhanced spark trail with more density
-                        if (Math.random() < 0.65) {
+                        // Procedurally spawn spark trail
+                        if (Math.random() < 0.45) {
                             spawnTrailSpark(rocketGroup.position.x, rocketGroup.position.y, rocketGroup.position.z);
                         }
-                        // Additional glow pulse
-                        light.intensity = 2.5 + Math.sin(Date.now() * 0.01) * 1.2;
                     },
                     onComplete: () => {
                         scene.remove(rocketGroup);
@@ -882,40 +843,24 @@
         function spawnTrailSpark(x, y, z) {
             const size = 0.04 + Math.random() * 0.03;
             const sparkGeo = new THREE.BoxGeometry(size, size, size);
-            const sparkColors = [0xfbbf24, 0xf97316, 0xffed4e];
             const sparkMat = new THREE.MeshBasicMaterial({
-                color: sparkColors[Math.floor(Math.random() * sparkColors.length)],
-                emissive: 0xfbbf24,
-                emissiveIntensity: 0.8,
+                color: 0xfbbf24,
                 transparent: true,
-                opacity: 0.9
+                opacity: 0.75
             });
             const spark = new THREE.Mesh(sparkGeo, sparkMat);
-            spark.position.set(x + (Math.random() - 0.5) * 0.12, y - 0.2, z + (Math.random() - 0.5) * 0.12);
+            spark.position.set(x + (Math.random() - 0.5) * 0.08, y - 0.15, z + (Math.random() - 0.5) * 0.08);
             scene.add(spark);
 
             gsap.to(spark.position, {
-                y: spark.position.y - 1.2 - Math.random() * 0.6,
-                x: spark.position.x + (Math.random() - 0.5) * 0.5,
-                z: spark.position.z + (Math.random() - 0.5) * 0.3,
-                duration: 0.7,
-                ease: "power2.out"
-            });
-            gsap.to(spark.rotation, {
-                x: Math.random() * Math.PI * 4,
-                y: Math.random() * Math.PI * 4,
-                z: Math.random() * Math.PI * 4,
-                duration: 0.7
+                y: spark.position.y - 0.8 - Math.random() * 0.4,
+                x: spark.position.x + (Math.random() - 0.5) * 0.3,
+                duration: 0.55,
+                ease: "power1.out"
             });
             gsap.to(spark.scale, {
                 x: 0.01, y: 0.01, z: 0.01,
-                duration: 0.7,
-                ease: "power1.in"
-            });
-            gsap.to(sparkMat, {
-                opacity: 0,
-                duration: 0.7,
-                ease: "power1.in",
+                duration: 0.55,
                 onComplete: () => scene.remove(spark)
             });
         }
@@ -985,9 +930,9 @@
                 });
             }
 
-            // 3. Heart Explosion (3D Extruded Shiny Hearts with enhanced glow!)
-            const heartCount = 18 + Math.floor(Math.random() * 12);
-            const heartColors = [0xdb2777, 0xf472b6, 0xe11d48, 0xff75c3, 0xf43f5e, 0xff1493, 0xff69b4];
+            // 3. Heart Explosion (3D Extruded Shiny Hearts!)
+            const heartCount = 12 + Math.floor(Math.random() * 8);
+            const heartColors = [0xdb2777, 0xf472b6, 0xe11d48, 0xff75c3, 0xf43f5e];
             const heartGeo = getHeartGeometry();
 
             for (let i = 0; i < heartCount; i++) {
@@ -995,10 +940,10 @@
 
                 const mat = new THREE.MeshStandardMaterial({
                     color: color,
-                    roughness: 0.08,
-                    metalness: 0.3,
+                    roughness: 0.1,
+                    metalness: 0.15,
                     emissive: color,
-                    emissiveIntensity: 0.7,
+                    emissiveIntensity: 0.38,
                     transparent: true,
                     opacity: 1.0,
                     side: THREE.DoubleSide
@@ -1009,70 +954,55 @@
                 heart.scale.set(0, 0, 0); // start tiny
                 scene.add(heart);
 
-                // Add glow light around each heart
-                const heartLight = new THREE.PointLight(color, 1.8, 4);
-                heartLight.position.set(0, 0, 0);
-                heart.add(heartLight);
-
                 const phi = Math.random() * Math.PI * 2;
                 const theta = Math.acos((Math.random() * 2) - 1);
-                const force = 2.5 + Math.random() * 5.0;
+                const force = 2.0 + Math.random() * 4.0;
                 const targetX = x + Math.sin(theta) * Math.cos(phi) * force;
-                const targetY = y + Math.sin(theta) * Math.sin(phi) * force + 1.0; // rise more dramatically
+                const targetY = y + Math.sin(theta) * Math.sin(phi) * force + 0.6; // rise slightly
                 const targetZ = z + Math.cos(theta) * force;
 
-                // Scale up dynamically with dramatic effect
+                // Scale up dynamically
                 gsap.to(heart.scale, {
-                    x: 0.7 + Math.random() * 0.6,
-                    y: 0.7 + Math.random() * 0.6,
-                    z: 0.7 + Math.random() * 0.6,
-                    duration: 0.5,
-                    ease: "elastic.out(1.2)"
+                    x: 0.6 + Math.random() * 0.5,
+                    y: 0.6 + Math.random() * 0.5,
+                    z: 0.6 + Math.random() * 0.5,
+                    duration: 0.45,
+                    ease: "back.out(1.5)"
                 });
 
-                // Spin around all axes with more dramatic tumble
-                const rotX = (Math.random() - 0.5) * 12;
-                const rotY = (Math.random() - 0.5) * 12;
-                const rotZ = (Math.random() - 0.5) * 12;
+                // Spin around all axes for a lively 3D tumble
+                const rotX = (Math.random() - 0.5) * 8;
+                const rotY = (Math.random() - 0.5) * 8;
+                const rotZ = (Math.random() - 0.5) * 8;
                 gsap.to(heart.rotation, {
                     x: rotX,
                     y: rotY,
                     z: rotZ,
-                    duration: 1.8 + Math.random() * 0.8,
-                    ease: "power2.out"
+                    duration: 1.6 + Math.random() * 0.5,
+                    ease: "power1.out"
                 });
 
-                // Fly outwards with more energy
+                // Fly outwards
                 gsap.to(heart.position, {
                     x: targetX,
                     y: targetY,
                     z: targetZ,
-                    duration: 1.8 + Math.random() * 0.8,
-                    ease: "elastic.out(0.8)"
-                });
-
-                // Pulsing glow effect
-                gsap.to(heartLight, {
-                    intensity: 2.8,
-                    duration: 0.3,
-                    repeat: 5,
-                    yoyo: true,
-                    delay: 0.1
+                    duration: 1.6 + Math.random() * 0.5,
+                    ease: "power2.out"
                 });
 
                 // Scale down and fade away
                 gsap.to(heart.scale, {
                     x: 0.001, y: 0.001, z: 0.001,
-                    duration: 0.8,
-                    delay: 1.0 + Math.random() * 0.5,
-                    ease: "back.in(1.8)"
+                    duration: 0.7,
+                    delay: 0.9 + Math.random() * 0.4,
+                    ease: "power2.in"
                 });
 
                 gsap.to(mat, {
                     opacity: 0,
-                    emissiveIntensity: 0,
-                    duration: 0.8,
-                    delay: 1.0 + Math.random() * 0.5,
+                    duration: 0.7,
+                    delay: 0.9 + Math.random() * 0.4,
                     ease: "power2.in",
                     onComplete: () => {
                         scene.remove(heart);
